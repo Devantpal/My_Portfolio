@@ -315,7 +315,7 @@ footer{position:relative;z-index:10;text-align:center;padding:32px clamp(20px,6v
 
 <!-- NAV -->
 <nav>
-  <div class="nl" onclick="scrollTo({top:0,behavior:'smooth'})">Mr DP</div>
+  <div class="nl" onclick="scrollTo({top:0,behavior:'smooth'})">Mr. DP</div>
   <ul class="nls">
     <li><a href="#skills">Skills</a></li>
     <li><a href="#experience">Experience</a></li>
@@ -849,22 +849,88 @@ function closeMM(){ document.getElementById('mm').classList.remove('open'); }
 
 /* ── CONTACT FORM ── */
 function handleForm(){
-  var name=document.getElementById('cf-name').value.trim();
-  var email=document.getElementById('cf-email').value.trim();
-  var msg=document.getElementById('cf-msg').value.trim();
-  var note=document.getElementById('cfnote');
-  var btn=document.getElementById('cfbtn');
-  if(!name||!email||!msg){ note.style.color='#ff6b6b'; note.textContent='Please fill in all required fields.'; return; }
-  btn.textContent='Sending...'; btn.disabled=true; note.textContent='';
-  setTimeout(function(){
-    btn.textContent='Message Sent!';
-    btn.style.background='linear-gradient(135deg,#00ffcc,#00d4ff)';
-    note.style.color='var(--cyan2)';
-    note.textContent="Thanks! I'll get back to you soon.";
+
+  // 🔹 Get form values
+  var name = document.getElementById('cf-name').value.trim();
+  var email = document.getElementById('cf-email').value.trim();
+  var subject = document.getElementById('cf-subj').value.trim();
+  var message = document.getElementById('cf-msg').value.trim();
+
+  var note = document.getElementById('cfnote');
+  var btn = document.getElementById('cfbtn');
+
+  // 🔸 Validation
+  if(!name || !email || !message){
+    note.style.color = '#ff6b6b';
+    note.textContent = 'Please fill all required fields.';
+    return;
+  }
+
+  if(message.length < 10){
+    note.style.color = '#ff6b6b';
+    note.textContent = 'Message should be at least 10 characters.';
+    return;
+  }
+
+  // 🔹 UI Loading State
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  note.textContent = '';
+
+  // 🔹 Template Data
+  var templateParams = {
+    name: name,
+    email: email,
+    subject: subject,
+    message: message
+  };
+
+  // 🔥 SEND EMAIL (YOUR CREDENTIALS USED)
+  emailjs.send(
+    "service_3juy25u",        // ✅ Your Service ID
+    "template_vhpgxze",       // ✅ Your Contact Template ID
+    templateParams
+  )
+  .then(function(response){
+
+    // ✅ SUCCESS UI
+    btn.textContent = 'Message Sent!';
+    btn.style.background = 'linear-gradient(135deg,#00ffcc,#00d4ff)';
+    note.style.color = '#00ffcc';
+    note.textContent = "✅ Message sent successfully!";
+
+    // Reset form
     document.getElementById('contactForm').reset();
-    setTimeout(function(){ btn.textContent='Send Message \u2192'; btn.disabled=false; btn.style.background=''; note.textContent=''; }, 4000);
-  }, 1100);
+
+    // Reset button after 4 sec
+    setTimeout(function(){
+      btn.textContent = 'Send Message →';
+      btn.disabled = false;
+      btn.style.background = '';
+      note.textContent = '';
+    }, 4000);
+
+  })
+  .catch(function(error){
+
+    // ❌ ERROR UI
+    btn.textContent = 'Failed ❌';
+    btn.disabled = false;
+    note.style.color = 'red';
+    note.textContent = "Something went wrong. Try again.";
+
+    console.log("EmailJS Error:", error);
+  });
 }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<script>
+(function(){
+  emailjs.init("-mVsUdT78_BjuSYzr"); // ✅ Your Public Key
+})();
+</script>
+
 </body>
 </html>
